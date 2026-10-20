@@ -1,0 +1,15 @@
+name: macOS routing
+on:
+  pull_request:
+  push:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  routing:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test generated routes and explicit exclusions
+        run: sh scripts/test-routing.sh

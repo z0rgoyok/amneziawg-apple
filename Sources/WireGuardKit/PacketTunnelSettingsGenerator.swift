@@ -257,6 +257,10 @@ class PacketTunnelSettingsGenerator {
     private func excludedRoutes() -> ([NEIPv4Route], [NEIPv6Route]) {
         var ipv4ExcludedRoutes = [NEIPv4Route]()
         var ipv6ExcludedRoutes = [NEIPv6Route]()
+        // macOS scopes the tunnel provider's own connections outside its tunnel.
+        // Excluding the endpoint globally also bypasses VPN routes for services
+        // hosted on that address. Preserve explicit ExcludedIPs below.
+        #if !os(macOS)
         for endpoint in resolvedEndpoints {
             guard let endpoint = endpoint else { continue }
             switch endpoint.host {
@@ -268,6 +272,7 @@ class PacketTunnelSettingsGenerator {
                 fatalError()
             }
         }
+        #endif
 
         for peer in tunnelConfiguration.peers {
             for addressRange in peer.excludeIPs {
